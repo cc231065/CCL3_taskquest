@@ -24,6 +24,24 @@ TaskQuest is a mobile application built with Kotlin, designed to make task manag
     Database: Room (local database for storing tasks and progress)
     UI Design: XML layouts with Material Design components
 
+Use Case
+
+    Problem:
+    Managing tasks efficiently can be overwhelming, especially when juggling multiple responsibilities like work, personal errands, or long-term goals. Traditional to-do list apps often feel dull and lack the motivation to keep users engaged.
+
+    Solution:
+    askQuest provides a gamified to-do list experience, turning task management into a rewarding and fun process. Users can create tasks with different frequencies (daily, weekly, or monthly), earn XP as they complete them, and level up their profiles to track their progress. This keeps users motivated to stay productive  and organized.
+    Target User
+
+Primary Audience:
+
+    Students:
+        Need to manage assignments, study schedules, and personal errands while staying motivated.
+    Young Professionals:
+        Balance work tasks, personal goals, and household responsibilities effectively.
+    Gamification Enthusiasts:
+        Enjoy RPG-style systems that reward effort and provide a sense of progression.
+
 🚀 Getting Started
 1. Download the apk file
 
