@@ -33,7 +33,7 @@ Use Case
     askQuest provides a gamified to-do list experience, turning task management into a rewarding and fun process. Users can create tasks with different frequencies (daily, weekly, or monthly), earn XP as they complete them, and level up their profiles to track their progress. This keeps users motivated to stay productive  and organized.
     Target User
 
-Primary Audience:
+Target User:
 
     Students:
         Need to manage assignments, study schedules, and personal errands while staying motivated.
