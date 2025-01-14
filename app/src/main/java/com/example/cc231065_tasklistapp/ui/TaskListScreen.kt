@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 
 @Composable
 fun TaskListScreen(viewModel: TaskViewModel = viewModel()) {
@@ -32,10 +33,9 @@ fun TaskListScreen(viewModel: TaskViewModel = viewModel()) {
     var taskCategory by remember { mutableStateOf("") }
     var taskFrequency by remember { mutableStateOf("") }
 
-    var selectedTask by remember { mutableStateOf<Task?>(null) } // Task to show in details dialog
-    var isDialogVisible by remember { mutableStateOf(false) } // Controls dialog visibility
+    var selectedTask by remember { mutableStateOf<Task?>(null) }
+    var isDialogVisible by remember { mutableStateOf(false) }
 
-    // Layout for Task List Screen
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Text(text = "Task List", style = MaterialTheme.typography.titleLarge)
 
@@ -105,15 +105,18 @@ fun TaskListScreen(viewModel: TaskViewModel = viewModel()) {
         // Display the list of tasks
         LazyColumn {
             items(tasks) { task ->
-                TaskItem(task = task, onDeleteClick = { viewModel.deleteTask(task) }, onClick = {
-                    selectedTask = task
-                    isDialogVisible = true
-                })
+                TaskItem(
+                    task = task,
+                    onDeleteClick = { viewModel.deleteTask(task) },
+                    onClick = {
+                        selectedTask = task
+                        isDialogVisible = true
+                    }
+                )
             }
         }
     }
 
-    // Show task details dialog when a task is clicked
     if (isDialogVisible && selectedTask != null) {
         TaskDetailsDialog(task = selectedTask!!, onDismiss = { isDialogVisible = false })
     }
@@ -121,14 +124,29 @@ fun TaskListScreen(viewModel: TaskViewModel = viewModel()) {
 
 @Composable
 fun TaskItem(task: Task, onDeleteClick: () -> Unit, onClick: () -> Unit) {
-    Row(modifier = Modifier.fillMaxWidth().padding(8.dp).clickable { onClick() }) {
-        Text(
-            text = task.title,
-            modifier = Modifier.weight(1f),
-            style = MaterialTheme.typography.bodyLarge
-        )
-        IconButton(onClick = onDeleteClick) {
-            Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp, horizontal = 8.dp)
+            .clickable { onClick() },
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+    ) {
+        // Centering the title inside the card
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = task.title,
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontSize = MaterialTheme.typography.titleLarge.fontSize * 1.5 // Bigger title font size
+                ),
+                color = MaterialTheme.colorScheme.onSurface
+            )
         }
     }
 }
@@ -140,10 +158,25 @@ fun TaskDetailsDialog(task: Task, onDismiss: () -> Unit) {
         title = { Text("Task Details") },
         text = {
             Column {
-                Text("Title: ${task.title}")
-                Text("Description: ${task.description}")
-                Text("Category: ${task.category}")
-                Text("Frequency: ${task.frequency}")
+                Text(
+                    text = "Title: ${task.title}",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Description: ${task.description}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Category: ${task.category}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Frequency: ${task.frequency}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         },
         confirmButton = {
