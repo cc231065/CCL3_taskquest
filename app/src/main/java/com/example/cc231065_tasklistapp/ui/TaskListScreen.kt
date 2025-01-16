@@ -1,27 +1,46 @@
 package com.example.cc231065_tasklistapp.ui
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cc231065_tasklistapp.model.Task
 import com.example.cc231065_tasklistapp.model.TaskViewModel
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.background
 
 @Composable
 fun TaskListScreen(viewModel: TaskViewModel = viewModel()) {
@@ -36,45 +55,112 @@ fun TaskListScreen(viewModel: TaskViewModel = viewModel()) {
     var selectedTask by remember { mutableStateOf<Task?>(null) }
     var isDialogVisible by remember { mutableStateOf(false) }
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Text(text = "Task List", style = MaterialTheme.typography.titleLarge)
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
 
+        Text(
+            text = "Task List",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .align(Alignment.TopCenter) // Align the title at the top-center
+                .padding(top = 10.dp) // Add spacing from the top
+        )
         Spacer(modifier = Modifier.height(16.dp))
 
         // Input fields for new task
-        Text(text = "Task Title", style = MaterialTheme.typography.bodyLarge)
-        BasicTextField(
-            value = taskTitle,
-            onValueChange = { taskTitle = it },
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = {
-                // Any specific action on done can go here
-            }),
-            modifier = Modifier.fillMaxWidth().padding(8.dp),
-            decorationBox = { innerTextField -> Box(modifier = Modifier.fillMaxWidth()) { innerTextField() } }
-        )
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopStart) // Align to the top-left
+                .padding(top = 80.dp) // Position below the title
+                .fillMaxWidth()
+        ) {
+            Column {
+                Text(text = "Task Title", style = MaterialTheme.typography.bodyLarge)
+                BasicTextField(
+                    value = taskTitle,
+                    onValueChange = { taskTitle = it },
+                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = {
+                        // Any specific action on done can go here
+                    }),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            MaterialTheme.colorScheme.surface,
+                            shape = MaterialTheme.shapes.medium
+                        )
+                        .border(
+                            width = 1.dp,
+                            color = Color.Black, // Black border
+                            shape = MaterialTheme.shapes.medium)
 
-        Text(text = "Task Description", style = MaterialTheme.typography.bodyLarge)
-        BasicTextField(
-            value = taskDescription,
-            onValueChange = { taskDescription = it },
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-            modifier = Modifier.fillMaxWidth().padding(8.dp),
-            decorationBox = { innerTextField -> Box(modifier = Modifier.fillMaxWidth()) { innerTextField() } }
-        )
+                        .padding(16.dp) // Add inner padding for the text field
+                )
+            }
+        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopStart) // Align to the top-left
+                .padding(top = 160.dp) // Position below the Task Title
+        ) {
+            Column {
+
+                Text(text = "Task Description", style = MaterialTheme.typography.bodyLarge)
+                BasicTextField(
+                    value = taskDescription,
+                    onValueChange = { taskDescription = it },
+                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            MaterialTheme.colorScheme.surface,
+                            shape = MaterialTheme.shapes.medium
+                        )
+                        .border(
+                            width = 1.dp,
+                            color = Color.Black, // Black border
+                            shape = MaterialTheme.shapes.medium)
+
+                        .padding(16.dp)
+                )
+            }
+        }
+
 
         // Input field for category (e.g., Housework, Exercise)
-        Text(text = "Category", style = MaterialTheme.typography.bodyLarge)
-        BasicTextField(
-            value = taskCategory,
-            onValueChange = { taskCategory = it },
-            modifier = Modifier.fillMaxWidth().padding(8.dp),
-            decorationBox = { innerTextField -> Box(modifier = Modifier.fillMaxWidth()) { innerTextField() } }
-        )
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopStart) // Align to the top-left
+                .padding(top = 240.dp) // Position below the Task Description
+        ) {
+            Column {
 
+                Text(text = "Category", style = MaterialTheme.typography.bodyLarge)
+                BasicTextField(
+                    value = taskCategory,
+                    onValueChange = { taskCategory = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            MaterialTheme.colorScheme.surface,
+                            shape = MaterialTheme.shapes.medium
+                        )
+                        .border(
+                            width = 1.dp,
+                            color = Color.Black, // Black border
+                            shape = MaterialTheme.shapes.medium)
+                        .padding(16.dp)
+                )
+            }
+        }
         Spacer(modifier = Modifier.height(16.dp))
+
 
         // Button to add a new task
         Button(
@@ -92,18 +178,36 @@ fun TaskListScreen(viewModel: TaskViewModel = viewModel()) {
                     taskCategory = ""
                     Toast.makeText(context, "Task Added!", Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(context, "Please enter all fields", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Please enter all fields", Toast.LENGTH_SHORT)
+                        .show()
                 }
             },
-            modifier = Modifier.align(Alignment.End)
+
+            // Button Colors
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Red, // Background Color
+                contentColor = Color.Yellow // Text Color
+            ),
+
+            modifier = Modifier
+                .align(Alignment.BottomEnd) // Positions the button in the bottom-right corner
+                .padding(18.dp) // Adds padding from the edges
         ) {
             Text(text = "Add Task")
         }
 
+
+
         Spacer(modifier = Modifier.height(16.dp))
 
         // Display the list of tasks
-        LazyColumn {
+        LazyColumn(
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(top = 320.dp) // Position below the input fields
+                .fillMaxWidth() // Stretch horizontally
+                .fillMaxHeight(0.5f) // Take half of the remaining vertical space
+        ) {
             items(tasks) { task ->
                 TaskItem(
                     task = task,
@@ -116,11 +220,11 @@ fun TaskListScreen(viewModel: TaskViewModel = viewModel()) {
             }
         }
     }
-
     if (isDialogVisible && selectedTask != null) {
         TaskDetailsDialog(task = selectedTask!!, onDismiss = { isDialogVisible = false })
     }
 }
+
 
 @Composable
 fun TaskItem(task: Task, onDeleteClick: () -> Unit, onClick: () -> Unit) {
