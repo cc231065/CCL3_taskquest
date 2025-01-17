@@ -41,6 +41,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cc231065_tasklistapp.model.Task
 import com.example.cc231065_tasklistapp.model.TaskViewModel
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 
 @Composable
 fun TaskListScreen(viewModel: TaskViewModel = viewModel()) {
@@ -225,32 +230,41 @@ fun TaskListScreen(viewModel: TaskViewModel = viewModel()) {
     }
 }
 
-
 @Composable
 fun TaskItem(task: Task, onDeleteClick: () -> Unit, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 12.dp, horizontal = 8.dp)
-            .clickable { onClick() },
+            .clickable { onClick() }, // Open task details when clicked
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
-        // Centering the title inside the card
-        Box(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp),
-            contentAlignment = Alignment.Center
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically // Align content vertically centered
         ) {
+            // Task title
             Text(
                 text = task.title,
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontSize = MaterialTheme.typography.titleLarge.fontSize * 1.5 // Bigger title font size
-                ),
-                color = MaterialTheme.colorScheme.onSurface
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.weight(1f) // Take up remaining horizontal space
             )
+
+            // Delete icon (trashcan)
+            IconButton(
+                onClick = { onDeleteClick() }, // Trigger delete callback
+                modifier = Modifier.padding(start = 8.dp) // Add some spacing
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete, // Trashcan icon
+                    contentDescription = "Delete Task", // Accessibility description
+                    tint = Color.Gray // Set icon color to grey
+                )
+            }
         }
     }
 }
