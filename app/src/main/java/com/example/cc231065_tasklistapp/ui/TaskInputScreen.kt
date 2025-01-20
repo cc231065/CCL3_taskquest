@@ -24,9 +24,7 @@ import androidx.compose.material3.IconButton
 @Composable
 fun TaskInputScreen(
     navController: NavController,
-    onTaskAdded: (String, String, String) -> Unit,
-    categories: List<String>,
-    onCategoryAdded: (String) -> Unit
+    onTaskAdded: (String, String, String) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -34,9 +32,10 @@ fun TaskInputScreen(
     var taskDescription by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf<String?>(null) }
     var showCategoryDialog by remember { mutableStateOf(false) }
-    var newCategory by remember { mutableStateOf("") }
 
-    // Scaffold with TopAppBar
+    // Corrected categories
+    val categories = listOf("Daily", "Weekly", "Monthly", "One Time")
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -50,14 +49,12 @@ fun TaskInputScreen(
                     }
                 },
                 actions = {
-                    // Done Button on the right side of the header
                     TextButton(
                         onClick = {
                             if (taskTitle.isNotBlank() && taskDescription.isNotBlank()) {
-                                // Show category dialog if task title and description are filled
                                 showCategoryDialog = true
                             } else {
-                                Toast.makeText(context, "Please fill in both Task Title and Task Description", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Please fill in Task Title and Description", Toast.LENGTH_SHORT).show()
                             }
                         }
                     ) {
@@ -98,7 +95,7 @@ fun TaskInputScreen(
                 onValueChange = { taskDescription = it },
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Default),
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .background(
                         MaterialTheme.colorScheme.surface,
                         shape = MaterialTheme.shapes.medium
@@ -112,65 +109,43 @@ fun TaskInputScreen(
     if (showCategoryDialog) {
         AlertDialog(
             onDismissRequest = { showCategoryDialog = false },
-            title = { Text("Select or Add Category") },
+            title = { Text("Select Category") },
             text = {
                 Column {
-                    // Existing Categories
-                    Text("Select an Existing Category")
+                    Text("Select a Category:")
                     Spacer(modifier = Modifier.height(8.dp))
                     categories.forEach { category ->
-                        Text(
-                            text = category,
+                        Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable {
-                                    selectedCategory = category
-                                    showCategoryDialog = false
-                                    Toast.makeText(context, "Selected Category: $category", Toast.LENGTH_SHORT).show()
-                                }
+                                .clickable { selectedCategory = category }
                                 .padding(8.dp)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Add New Category
-                    Text("Add a New Category")
-                    BasicTextField(
-                        value = newCategory,
-                        onValueChange = { newCategory = it },
-                        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-                        keyboardActions = KeyboardActions(onDone = {
-                            if (newCategory.isNotBlank()) {
-                                onCategoryAdded(newCategory)
-                                selectedCategory = newCategory
-                                newCategory = ""
-                                showCategoryDialog = false
-                                Toast.makeText(context, "Category Added", Toast.LENGTH_SHORT).show()
-                            }
-                        }),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                MaterialTheme.colorScheme.surface,
-                                shape = MaterialTheme.shapes.medium
+                        ) {
+                            RadioButton(
+                                selected = selectedCategory == category,
+                                onClick = { selectedCategory = category }
                             )
-                            .padding(16.dp)
-                    )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(category)
+                        }
+                    }
                 }
             },
             confirmButton = {
                 Button(
                     onClick = {
-                        if (taskTitle.isNotBlank() && taskDescription.isNotBlank() && selectedCategory != null) {
+                        if (selectedCategory != null) {
+                            // Add task and navigate back
                             onTaskAdded(taskTitle, taskDescription, selectedCategory!!)
-                            navController.popBackStack()  // Redirect back to the task list
                         } else {
                             Toast.makeText(context, "Please select a category", Toast.LENGTH_SHORT).show()
                         }
+                        navController.navigate("taskList") {
+                            popUpTo("taskInput") { inclusive = true } // This will clear the back stack up to the TaskInput screen
+                        }
                     }
                 ) {
-                    Text("Save Task")
+                    Text("Select Category")
                 }
             },
             dismissButton = {
