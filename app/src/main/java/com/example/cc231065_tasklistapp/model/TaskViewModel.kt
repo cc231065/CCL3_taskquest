@@ -101,8 +101,6 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
         task.isCompleted = true
         task.completedDate = Date()
         user.xp += task.xpValue // Award XP to the user based on task completion
-
-        // You can also mark the task as completed in the database or ViewModel.
         updateUserLevel(user) // Update user level based on total XP
     }
 

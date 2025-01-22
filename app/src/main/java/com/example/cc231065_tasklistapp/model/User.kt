@@ -8,5 +8,5 @@ data class User(
 )
 
 fun updateUserLevel(user: User) {
-    user.level = (user.xp / 1000) + 1 // Level up after every 100 XP
+    user.level = (user.xp / 1000) + 1
 }

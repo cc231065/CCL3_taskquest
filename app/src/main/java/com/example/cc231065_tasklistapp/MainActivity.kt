@@ -42,7 +42,8 @@ class MainActivity : ComponentActivity() {
                         composable("taskList") {
                             TaskListScreen(
                                 navController = navController,
-                                viewModel = taskViewModel // Passing the ViewModel here
+                                viewModel = taskViewModel, // Passing the ViewModel here
+                                user = user
                             )
                         }
 
@@ -50,13 +51,31 @@ class MainActivity : ComponentActivity() {
                             TaskInputScreen(
                                 navController = navController,
                                 onTaskAdded = { title, description, category ->
-                                    // Call ViewModel to insert the task
-                                    taskViewModel.insertTask(Task(title = title, description = description, category = category))
-                                    // Navigate back after adding the task
+                                    // Calculate XP based on the category
+                                    val xp = when (category) {
+                                        "Daily" -> 50
+                                        "Weekly" -> 100
+                                        "Monthly" -> 200
+                                        "Onetime" -> 100
+                                        else -> 0
+                                    }
+
+                                    // Add the task using the ViewModel, including the calculated XP
+                                    taskViewModel.insertTask(
+                                        Task(
+                                            title = title,
+                                            description = description,
+                                            category = category,
+                                            xpValue = xp // Add the XP to the task object
+                                        )
+                                    )
+
+                                    // Navigate back to the task list after adding the task
                                     navController.popBackStack()
                                 }
                             )
                         }
+
 
                         // New Profile Screen destination
                         composable("profile") {

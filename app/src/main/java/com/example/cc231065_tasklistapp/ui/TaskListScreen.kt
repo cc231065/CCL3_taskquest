@@ -1,5 +1,6 @@
     package com.example.cc231065_tasklistapp.ui
 
+    import android.app.Application
     import android.widget.Toast
     import androidx.compose.foundation.background
     import androidx.compose.foundation.border
@@ -32,17 +33,19 @@
     import androidx.compose.material3.Icon
     import androidx.compose.material3.IconButton
     import com.example.cc231065_tasklistapp.model.Task
+    import com.example.cc231065_tasklistapp.model.User
     import com.example.cc231065_tasklistapp.model.TaskViewModel
     import com.example.cc231065_tasklistapp.ui.TaskInputScreen
     import androidx.compose.foundation.Image
     import androidx.compose.material.icons.filled.AccountCircle
+    import androidx.compose.material.icons.filled.Check
     import androidx.compose.ui.res.painterResource
     import com.example.cc231065_tasklistapp.R
-
+    import com.example.cc231065_tasklistapp.model.TaskViewModelFactory
 
 
     @Composable
-    fun TaskListScreen(navController: NavController, viewModel: TaskViewModel = viewModel()) {
+    fun TaskListScreen(navController: NavController, viewModel: TaskViewModel = viewModel(), user: User) {
         // Observe tasks from the ViewModel
         val tasks by viewModel.allTasks.collectAsState(initial = emptyList())
         val context = LocalContext.current
@@ -86,7 +89,11 @@
                         onClick = {
                             selectedTask = task
                             isDialogVisible = true
-                        }
+                        },
+                        onCompleteClick = { viewModel.completeTask(
+                            task,
+                            user
+                        ) }
                     )
                 }
             }
@@ -128,7 +135,23 @@
     }
 
     @Composable
-    fun TaskItem(task: Task, onDeleteClick: () -> Unit, onClick: () -> Unit) {
+    fun TaskItem(
+        task: Task,
+        onDeleteClick: () -> Unit,
+        onClick: () -> Unit,
+        onCompleteClick: () -> Unit // New lambda for the completion button
+    ) {
+        // Define colors for each category
+        val categoryColors = mapOf(
+            "Onetime" to Color(0xFFB0BEC5), // Light Gray
+            "Daily" to Color(0xFFBBDEFB),   // Soft Light Blue
+            "Weekly" to Color(0xFF42A5F5),  // Vibrant Medium Blue
+            "Monthly" to Color(0xFF1565C0)  // Deep Dark Blue
+        )
+
+        // Assign a default color if the category is not mapped
+        val backgroundColor = categoryColors[task.category] ?: MaterialTheme.colorScheme.surfaceVariant
+
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -136,38 +159,84 @@
                 .clickable { onClick() },
             elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
             shape = MaterialTheme.shapes.medium,
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+            colors = CardDefaults.cardColors(containerColor = backgroundColor)
         ) {
+            // Wrap everything in a Box to allow flexible alignment
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(160.dp) // Adjust the height of each task item
                     .padding(16.dp)
             ) {
-                // Center the task title
-                Text(
-                    text = task.title,
-                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                    modifier = Modifier
-                        .align(Alignment.Center) // Center the text horizontally and vertically
-                )
+                // Task title and description (aligned to top-left)
+                Column {
+                    // Task title
+                    Text(
+                        text = task.title,
+                        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.align(Alignment.Start) // Align text to the start (top-left)
+                    )
 
-                // Delete icon at the top right
+                    Spacer(modifier = Modifier.height(8.dp)) // Add spacing between title and body
+
+                    // Task body (underneath title)
+                    Text(
+                        text = task.description ?: "No description provided", // Fallback text if description is null
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.align(Alignment.Start) // Align text to the start (under title)
+                    )
+                }
+
+                // Delete icon (aligned to top-right)
                 IconButton(
                     onClick = { onDeleteClick() },
                     modifier = Modifier
-                        .align(Alignment.TopEnd) // Position the icon at the top right
-                        .padding(2.dp) // Optional padding around the icon
+                        .align(Alignment.TopEnd) // Position the icon at the top-right
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Delete Task",
-                        tint = Color.Gray
+                        tint = Color.Black
+                    )
+                }
+
+                // Category and XP (aligned to bottom-left)
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart) // Align to the bottom-left corner
+                ) {
+                    // Display category
+                    Text(
+                        text = task.category,
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                        color = Color.Black, // Adjust text color for better readability
+                        modifier = Modifier.padding(end = 8.dp) // Add spacing between category and XP
+                    )
+
+                    // Display XP value
+                    Text(
+                        text = "- ${task.xpValue} XP", // XP text with a "+" sign
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Black // Adjust text color for better readability
+                    )
+                }
+
+                // Completion icon (aligned to bottom-right)
+                IconButton(
+                    onClick = { onCompleteClick() }, // Handle task completion
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd) // Align to the bottom-right corner
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Check, // Checkmark icon
+                        contentDescription = "Mark as Complete",
+                        tint = Color.Black
                     )
                 }
             }
         }
     }
+
 
     @Composable
     fun TaskDetailsDialog(task: Task, onDismiss: () -> Unit) {
@@ -195,5 +264,8 @@
     @Preview(showBackground = true)
     @Composable
     fun PreviewTaskListScreen() {
-        TaskListScreen(navController = rememberNavController())
+        TaskListScreen(
+            navController = rememberNavController(),
+            user = User(1, "PreviewUser", 50, 1) // Dummy data for preview
+        )
     }

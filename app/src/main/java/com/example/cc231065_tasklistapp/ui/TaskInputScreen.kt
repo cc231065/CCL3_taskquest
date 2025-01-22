@@ -34,7 +34,7 @@ fun TaskInputScreen(
     var showCategoryDialog by remember { mutableStateOf(false) }
 
     // Corrected categories
-    val categories = listOf("Daily", "Weekly", "Monthly", "One Time")
+    val categories = listOf("Daily", "Weekly", "Monthly", "Onetime")
 
     Scaffold(
         topBar = {
