@@ -39,6 +39,7 @@
     import androidx.compose.foundation.Image
     import androidx.compose.material.icons.filled.AccountCircle
     import androidx.compose.material.icons.filled.Check
+    import androidx.compose.material.icons.filled.Refresh
     import androidx.compose.ui.res.painterResource
     import com.example.cc231065_tasklistapp.R
     import com.example.cc231065_tasklistapp.model.TaskViewModelFactory
@@ -92,7 +93,8 @@
                         },
                         onCompleteClick = { viewModel.completeTask(
                             task,
-                            user
+                            user,
+                            !task.isCompleted
                         ) }
                     )
                 }
@@ -139,7 +141,7 @@
         task: Task,
         onDeleteClick: () -> Unit,
         onClick: () -> Unit,
-        onCompleteClick: () -> Unit // New lambda for the completion button
+        onCompleteClick: (Boolean) -> Unit // New lambda for the completion button
     ) {
         // Define colors for each category
         val categoryColors = mapOf(
@@ -150,7 +152,11 @@
         )
 
         // Assign a default color if the category is not mapped
-        val backgroundColor = categoryColors[task.category] ?: MaterialTheme.colorScheme.surfaceVariant
+        val backgroundColor = if (task.isCompleted) {
+            Color(0xFF02d62d) // Green completion color for completed tasks
+        } else {
+            categoryColors[task.category] ?: MaterialTheme.colorScheme.surfaceVariant
+        }
 
         Card(
             modifier = Modifier
@@ -219,19 +225,41 @@
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.Black // Adjust text color for better readability
                     )
+
+                    // "COMPLETE" label for completed tasks
+                    if (task.isCompleted) {
+                        Spacer(modifier = Modifier.width(8.dp)) // Add spacing before COMPLETE text
+                        Text(
+                            text = "COMPLETE",
+                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                            color = Color.Black // Green color for "COMPLETE" label
+                        )
+                    }
                 }
 
-                // Completion icon (aligned to bottom-right)
+                // Completion icon (aligned to bottom-right) - change based on completion state
                 IconButton(
-                    onClick = { onCompleteClick() }, // Handle task completion
+                    onClick = {
+                        onCompleteClick(!task.isCompleted) // Handle task completion toggle
+                    },
                     modifier = Modifier
                         .align(Alignment.BottomEnd) // Align to the bottom-right corner
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Check, // Checkmark icon
-                        contentDescription = "Mark as Complete",
-                        tint = Color.Black
-                    )
+                    if (task.isCompleted) {
+                        // If the task is completed, show reset icon (redo circle)
+                        Icon(
+                            imageVector = Icons.Default.Refresh, // Re-do / Reset icon
+                            contentDescription = "Reset Task",
+                            tint = Color.Black
+                        )
+                    } else {
+                        // If the task is not completed, show checkmark icon
+                        Icon(
+                            imageVector = Icons.Default.Check, // Checkmark icon
+                            contentDescription = "Mark as Complete",
+                            tint = Color.Black
+                        )
+                    }
                 }
             }
         }

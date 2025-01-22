@@ -68,11 +68,14 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
         calendar.set(Calendar.MILLISECOND, 0)
         val truncatedCurrentDate = calendar.time
 
+        var isResetNeeded = false
+
         when (task.category) {
             "Daily" -> {
                 // If the task is completed and it's a new day, reset the completion status.
                 if (task.isCompleted && task.completedDate?.before(truncatedCurrentDate) == true) {
                     task.isCompleted = false
+                    isResetNeeded = true
                 }
             }
             "Weekly" -> {
@@ -81,6 +84,7 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
                 val previousWeekDate = calendar.time
                 if (task.isCompleted && task.completedDate?.before(previousWeekDate) == true) {
                     task.isCompleted = false
+                    isResetNeeded = true
                 }
             }
             "Monthly" -> {
@@ -89,19 +93,29 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
                 val previousMonthDate = calendar.time
                 if (task.isCompleted && task.completedDate?.before(previousMonthDate) == true) {
                     task.isCompleted = false
+                    isResetNeeded = true
                 }
             }
             "Onetime" -> {
                 // No reset needed for onetime tasks
             }
         }
+
+        if (isResetNeeded) {
+            viewModelScope.launch {
+                taskDao.updateTask(task) // Save reset task to database
+            }
+        }
     }
 
-    fun completeTask(task: Task, user: User) {
-        task.isCompleted = true
-        task.completedDate = Date()
+    fun completeTask(task: Task, user: User, isCompleted: Boolean) {
+        task.isCompleted = isCompleted
+        task.completedDate = if (isCompleted) Date() else null
         user.xp += task.xpValue // Award XP to the user based on task completion
         updateUserLevel(user) // Update user level based on total XP
+        viewModelScope.launch {
+            taskDao.updateTask(task)
+        }
+        println("Task '${task.title}' completion toggled: $isCompleted")
     }
-
 }
