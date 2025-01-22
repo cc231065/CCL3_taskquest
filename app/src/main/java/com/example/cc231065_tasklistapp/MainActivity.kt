@@ -83,7 +83,7 @@ class MainActivity : ComponentActivity() {
                             val tasks = taskViewModel.allTasks.collectAsState(initial = emptyList()).value
 
                             ProfileScreen(
-                                user = User(1, "TestUser", 500, 2), // Replace with your user data
+                                user = User(1, "TestUser", 100, 1), // Replace with your user data
                                 tasks = tasks,
                                 onNavigateBack = { navController.popBackStack() }
                             )
