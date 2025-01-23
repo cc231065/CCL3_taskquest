@@ -8,7 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import com.example.cc231065_tasklistapp.model.Task
 import com.example.cc231065_tasklistapp.model.User
 
@@ -21,7 +21,7 @@ fun ProfileScreen(user: User, tasks: List<Task>, onNavigateBack: () -> Unit) {
             .padding(16.dp)
     ) {
         IconButton(onClick = onNavigateBack) {
-            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
         }
 
         Text(

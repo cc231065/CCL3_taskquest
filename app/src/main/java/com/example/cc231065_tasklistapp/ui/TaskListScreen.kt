@@ -1,55 +1,40 @@
     package com.example.cc231065_tasklistapp.ui
 
-    import android.app.Application
-    import android.widget.Toast
-    import androidx.compose.foundation.background
-    import androidx.compose.foundation.border
     import androidx.compose.foundation.clickable
     import androidx.compose.foundation.layout.*
     import androidx.compose.foundation.lazy.LazyColumn
     import androidx.compose.foundation.lazy.items
-    import androidx.compose.foundation.text.BasicTextField
-    import androidx.compose.foundation.text.KeyboardActions
-    import androidx.compose.foundation.text.KeyboardOptions
     import androidx.compose.material3.*
     import androidx.compose.runtime.*
     import androidx.compose.ui.Alignment
     import androidx.compose.ui.Modifier
     import androidx.compose.ui.graphics.Color
-    import androidx.compose.ui.platform.LocalContext
     import androidx.compose.ui.text.font.FontWeight
-    import androidx.compose.ui.text.input.ImeAction
     import androidx.compose.ui.tooling.preview.Preview
     import androidx.compose.ui.unit.dp
     import androidx.lifecycle.viewmodel.compose.viewModel
     import androidx.navigation.NavController
     import androidx.navigation.compose.rememberNavController
     import androidx.compose.foundation.layout.Row
-    import androidx.compose.foundation.shape.CircleShape
     import androidx.compose.material.icons.Icons
-    import androidx.compose.material.icons.filled.Add
-    import androidx.compose.material.icons.filled.ArrowBack
     import androidx.compose.material.icons.filled.Delete
     import androidx.compose.material3.Icon
     import androidx.compose.material3.IconButton
     import com.example.cc231065_tasklistapp.model.Task
     import com.example.cc231065_tasklistapp.model.User
     import com.example.cc231065_tasklistapp.model.TaskViewModel
-    import com.example.cc231065_tasklistapp.ui.TaskInputScreen
     import androidx.compose.foundation.Image
     import androidx.compose.material.icons.filled.AccountCircle
     import androidx.compose.material.icons.filled.Check
     import androidx.compose.material.icons.filled.Refresh
     import androidx.compose.ui.res.painterResource
     import com.example.cc231065_tasklistapp.R
-    import com.example.cc231065_tasklistapp.model.TaskViewModelFactory
 
 
     @Composable
     fun TaskListScreen(navController: NavController, viewModel: TaskViewModel = viewModel(), user: User) {
         // Observe tasks from the ViewModel
         val tasks by viewModel.allTasks.collectAsState(initial = emptyList())
-        val context = LocalContext.current
 
         var selectedTask by remember { mutableStateOf<Task?>(null) }
         var isDialogVisible by remember { mutableStateOf(false) }
@@ -187,7 +172,7 @@
 
                     // Task body (underneath title)
                     Text(
-                        text = task.description ?: "No description provided", // Fallback text if description is null
+                        text = task.description, // Fallback text if description is null
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.align(Alignment.Start) // Align text to the start (under title)
                     )
@@ -241,7 +226,7 @@
                 IconButton(
                     onClick = {
                         onCompleteClick(!task.isCompleted) // Handle task completion toggle
-                    },
+                        },
                     modifier = Modifier
                         .align(Alignment.BottomEnd) // Align to the bottom-right corner
                 ) {
