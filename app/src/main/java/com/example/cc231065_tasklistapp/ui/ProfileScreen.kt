@@ -32,7 +32,6 @@ fun ProfileScreen(user: User, tasks: List<Task>, onNavigateBack: () -> Unit) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text("Username: ${user.username}")
         Text("Level: ${user.level}")
         Text("XP: ${user.xp}")
 
