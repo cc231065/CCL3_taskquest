@@ -2,6 +2,7 @@ package com.example.cc231065_tasklistapp.ui
 
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
@@ -70,6 +71,7 @@ fun TaskInputScreen(
         ) {
             // Task Title Field
             Text("Task Title", style = MaterialTheme.typography.bodyLarge)
+            Spacer(modifier = Modifier.height(4.dp))
             BasicTextField(
                 value = taskTitle,
                 onValueChange = { taskTitle = it },
@@ -81,13 +83,19 @@ fun TaskInputScreen(
                         MaterialTheme.colorScheme.surface,
                         shape = MaterialTheme.shapes.medium
                     )
-                    .padding(16.dp)
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = MaterialTheme.shapes.medium
+                    )
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Task Description Field
             Text("Task Description", style = MaterialTheme.typography.bodyLarge)
+            Spacer(modifier = Modifier.height(4.dp))
             BasicTextField(
                 value = taskDescription,
                 onValueChange = { taskDescription = it },
@@ -98,7 +106,12 @@ fun TaskInputScreen(
                         MaterialTheme.colorScheme.surface,
                         shape = MaterialTheme.shapes.medium
                     )
-                    .padding(16.dp)
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = MaterialTheme.shapes.medium
+                    )
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
             )
         }
     }
@@ -154,3 +167,4 @@ fun TaskInputScreen(
         )
     }
 }
+
