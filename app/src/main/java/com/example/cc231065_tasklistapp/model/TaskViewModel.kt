@@ -1,36 +1,56 @@
 package com.example.cc231065_tasklistapp.model
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cc231065_tasklistapp.database.TaskDatabaseInstance
 import com.example.cc231065_tasklistapp.dao.TaskDao
-import com.example.cc231065_tasklistapp.dao.CategoryDao
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.Date
-import java.util.Calendar
 
 class TaskViewModel(application: Application) : AndroidViewModel(application) {
     private val taskDao: TaskDao = TaskDatabaseInstance.getDatabase(application).taskDao()
-    private val categoryDao: CategoryDao = TaskDatabaseInstance.getDatabase(application).categoryDao()
+
+    // StateFlow for the selected task
+    private val _taskState = MutableStateFlow<Task?>(null)
+    val taskState: StateFlow<Task?> = _taskState
 
     // Flow to observe all tasks
     val allTasks: Flow<List<Task>> = taskDao.getAllTasks()
-
 
     init {
         // Add logging to ensure tasks are fetched
         viewModelScope.launch {
             allTasks.collect { tasks ->
                 println("All Tasks: $tasks") // Debugging log
+                Log.d("TaskViewModel", "All Tasks: ${tasks.map { it.id }}")
             }
         }
     }
 
-    // Flow to observe tasks by category
-    fun getTasksByCategory(category: String): Flow<List<Task>> {
-        return taskDao.getTasksByCategory(category)
+    // Fetch task by ID and emit it to the StateFlow
+    fun fetchTaskById(taskId: Int) {
+        viewModelScope.launch {
+            Log.d("TaskViewModel", "Fetching task for ID: $taskId")
+            allTasks.collect { tasks ->
+                val task = tasks.find { it.id == taskId }
+                Log.d("TaskViewModel", "Found task: $task")
+                _taskState.value = task
+            }
+        }
+    }
+
+
+    // Add an update function if not already there
+    fun updateTask(task: Task) {
+        viewModelScope.launch {
+            taskDao.updateTask(task)
+            Log.d("TaskViewModel", "Task updated: $task")
+        }
     }
 
     // Function to insert a task into the database
@@ -46,65 +66,6 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             taskDao.deleteTask(task)
             println("Task deleted: ${task.title}") // Debugging log
-        }
-    }
-
-    fun updateTaskXP(task: Task) {
-        task.xpValue = when (task.category) {
-            "Daily" -> 50
-            "Weekly" -> 100
-            "Monthly" -> 200
-            "Onetime" -> 100
-            else -> 0
-        }
-    }
-
-    fun resetTask(task: Task, currentDate: Date) {
-        val calendar = Calendar.getInstance()
-        calendar.time = currentDate
-        calendar.set(Calendar.HOUR_OF_DAY, 0)
-        calendar.set(Calendar.MINUTE, 0)
-        calendar.set(Calendar.SECOND, 0)
-        calendar.set(Calendar.MILLISECOND, 0)
-        val truncatedCurrentDate = calendar.time
-
-        var isResetNeeded = false
-
-        when (task.category) {
-            "Daily" -> {
-                // If the task is completed and it's a new day, reset the completion status.
-                if (task.isCompleted && task.completedDate?.before(truncatedCurrentDate) == true) {
-                    task.isCompleted = false
-                    isResetNeeded = true
-                }
-            }
-            "Weekly" -> {
-                // Reset the weekly task after a week if completed last week
-                calendar.add(Calendar.WEEK_OF_YEAR, -1)
-                val previousWeekDate = calendar.time
-                if (task.isCompleted && task.completedDate?.before(previousWeekDate) == true) {
-                    task.isCompleted = false
-                    isResetNeeded = true
-                }
-            }
-            "Monthly" -> {
-                // Reset the monthly task after a month if completed last month
-                calendar.add(Calendar.MONTH, -1)
-                val previousMonthDate = calendar.time
-                if (task.isCompleted && task.completedDate?.before(previousMonthDate) == true) {
-                    task.isCompleted = false
-                    isResetNeeded = true
-                }
-            }
-            "Onetime" -> {
-                // No reset needed for onetime tasks
-            }
-        }
-
-        if (isResetNeeded) {
-            viewModelScope.launch {
-                taskDao.updateTask(task) // Save reset task to database
-            }
         }
     }
 

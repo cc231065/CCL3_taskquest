@@ -26,6 +26,7 @@
     import androidx.compose.foundation.Image
     import androidx.compose.material.icons.filled.AccountCircle
     import androidx.compose.material.icons.filled.Check
+    import androidx.compose.material.icons.filled.Edit
     import androidx.compose.material.icons.filled.Refresh
     import androidx.compose.ui.res.painterResource
     import com.example.cc231065_tasklistapp.R
@@ -80,7 +81,11 @@
                             task,
                             user,
                             !task.isCompleted
-                        ) }
+                        ) },
+                        onEditClick = {
+                            // Navigate to the task edit screen
+                            navController.navigate("taskEdit/${task.id}")
+                        }
                     )
                 }
             }
@@ -126,7 +131,8 @@
         task: Task,
         onDeleteClick: () -> Unit,
         onClick: () -> Unit,
-        onCompleteClick: (Boolean) -> Unit // New lambda for the completion button
+        onCompleteClick: (Boolean) -> Unit,
+        onEditClick: () -> Unit // Add this parameter
     ) {
         // Define colors for each category
         val categoryColors = mapOf(
@@ -152,103 +158,73 @@
             shape = MaterialTheme.shapes.medium,
             colors = CardDefaults.cardColors(containerColor = backgroundColor)
         ) {
-            // Wrap everything in a Box to allow flexible alignment
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(160.dp) // Adjust the height of each task item
                     .padding(16.dp)
             ) {
-                // Task title and description (aligned to top-left)
                 Column {
-                    // Task title
                     Text(
                         text = task.title,
                         style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                        modifier = Modifier.align(Alignment.Start) // Align text to the start (top-left)
+                        modifier = Modifier.align(Alignment.Start)
                     )
-
-                    Spacer(modifier = Modifier.height(8.dp)) // Add spacing between title and body
-
-                    // Task body (underneath title)
+                    Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = task.description, // Fallback text if description is null
+                        text = task.description,
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.align(Alignment.Start) // Align text to the start (under title)
+                        modifier = Modifier.align(Alignment.Start)
                     )
                 }
 
-                // Delete icon (aligned to top-right)
-                IconButton(
-                    onClick = { onDeleteClick() },
+                // Icons for actions - placed on the right side with a slight left position for edit
+                Box(
                     modifier = Modifier
-                        .align(Alignment.TopEnd) // Position the icon at the top-right
+                        .align(Alignment.TopEnd)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete Task",
-                        tint = Color.Black
-                    )
-                }
+                    // Edit Button (slightly left of the delete icon)
+                    IconButton(
+                        onClick = { onEditClick() },
+                        modifier = Modifier.align(Alignment.TopEnd).padding(end = 36.dp) // Adjust this padding to position the edit button
+                    ) {
+                        Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit Task")
+                    }
 
-                // Category and XP (aligned to bottom-left)
-                Row(
-                    modifier = Modifier
-                        .align(Alignment.BottomStart) // Align to the bottom-left corner
-                ) {
-                    // Display category
-                    Text(
-                        text = task.category,
-                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                        color = Color.Black, // Adjust text color for better readability
-                        modifier = Modifier.padding(end = 8.dp) // Add spacing between category and XP
-                    )
-
-                    // Display XP value
-                    Text(
-                        text = "- ${task.xpValue} XP", // XP text with a "+" sign
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Black // Adjust text color for better readability
-                    )
-
-                    // "COMPLETE" label for completed tasks
-                    if (task.isCompleted) {
-                        Spacer(modifier = Modifier.width(8.dp)) // Add spacing before COMPLETE text
-                        Text(
-                            text = "COMPLETE",
-                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                            color = Color.Black // Green color for "COMPLETE" label
-                        )
+                    // Delete Button (on the right side)
+                    IconButton(
+                        onClick = { onDeleteClick() },
+                        modifier = Modifier.align(Alignment.TopEnd)
+                    ) {
+                        Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Task")
                     }
                 }
 
-                // Completion icon (aligned to bottom-right) - change based on completion state
+                Row(
+                    modifier = Modifier.align(Alignment.BottomStart)
+                ) {
+                    Text(
+                        text = task.category,
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    Text(text = "- ${task.xpValue} XP")
+                }
+
                 IconButton(
-                    onClick = {
-                        onCompleteClick(!task.isCompleted) // Handle task completion toggle
-                        },
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd) // Align to the bottom-right corner
+                    onClick = { onCompleteClick(!task.isCompleted) },
+                    modifier = Modifier.align(Alignment.BottomEnd)
                 ) {
                     if (task.isCompleted) {
-                        // If the task is completed, show reset icon (redo circle)
-                        Icon(
-                            imageVector = Icons.Default.Refresh, // Re-do / Reset icon
-                            contentDescription = "Reset Task",
-                            tint = Color.Black
-                        )
+                        Icon(imageVector = Icons.Default.Refresh, contentDescription = "Reset Task")
                     } else {
-                        // If the task is not completed, show checkmark icon
-                        Icon(
-                            imageVector = Icons.Default.Check, // Checkmark icon
-                            contentDescription = "Mark as Complete",
-                            tint = Color.Black
-                        )
+                        Icon(imageVector = Icons.Default.Check, contentDescription = "Mark as Complete")
                     }
                 }
             }
         }
     }
+
 
 
     @Composable

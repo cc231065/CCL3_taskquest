@@ -9,7 +9,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cc231065_tasklistapp.model.Task
 import com.example.cc231065_tasklistapp.model.User
 import com.example.cc231065_tasklistapp.ui.TaskInputScreen
@@ -18,6 +17,8 @@ import com.example.cc231065_tasklistapp.ui.ProfileScreen
 import com.example.cc231065_tasklistapp.model.TaskViewModel
 import com.example.cc231065_tasklistapp.model.TaskViewModelFactory
 import com.example.cc231065_tasklistapp.ui.theme.TaskListAppTheme
+import com.example.cc231065_tasklistapp.ui.TaskEditScreen
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,6 +45,16 @@ class MainActivity : ComponentActivity() {
                                 navController = navController,
                                 viewModel = taskViewModel, // Passing the ViewModel here
                                 user = user
+                            )
+                        }
+
+                        // This route will handle editing a task by passing the taskId
+                        composable("taskEdit/{taskId}") { backStackEntry ->
+                            val taskId = backStackEntry.arguments?.getString("taskId")
+                            TaskEditScreen(
+                                navController = navController,
+                                taskId = taskId,
+                                taskViewModel = taskViewModel
                             )
                         }
 
